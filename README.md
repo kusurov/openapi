@@ -1,3 +1,5 @@
+### ФОРК ДЛЯ ЛИЧНОГО ИСПОЛЬЗОВАНИЯ
+
 # OpenAPI v3.1 Specification
 
 [![Code Analysis](https://github.com/sv-tools/openapi/actions/workflows/checks.yaml/badge.svg)](https://github.com/sv-tools/openapi/actions/workflows/checks.yaml)

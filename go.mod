@@ -1,4 +1,4 @@
-module github.com/sv-tools/openapi
+module github.com/kusurov/openapi
 
 go 1.18
 

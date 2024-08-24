@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v3"
 
-	"github.com/sv-tools/openapi/spec"
+	"github.com/kusurov/openapi/spec"
 )
 
 type singleOrArrayCase[T any] struct {

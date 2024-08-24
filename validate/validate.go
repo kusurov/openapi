@@ -9,7 +9,7 @@ import (
 	"github.com/santhosh-tekuri/jsonschema/v5"
 	"gopkg.in/yaml.v3"
 
-	"github.com/sv-tools/openapi/spec"
+	"github.com/kusurov/openapi/spec"
 )
 
 var (

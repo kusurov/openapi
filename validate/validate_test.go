@@ -11,8 +11,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v3"
 
-	"github.com/sv-tools/openapi/spec"
-	"github.com/sv-tools/openapi/validate"
+	"github.com/kusurov/openapi/spec"
+	"github.com/kusurov/openapi/validate"
 )
 
 func TestValidation(t *testing.T) {
