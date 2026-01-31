@@ -60,9 +60,8 @@ func (o *Ref) WithDescription(v string) *Ref {
 //
 // NOTE: The Ref object takes precedent over Spec if using json or yaml Marshal and Unmarshal functions.
 type RefOrSpec[T any] struct {
-	Ref   *Ref `json:"-" yaml:"-"`
-	Spec  *T   `json:"-" yaml:"-"`
-	Order int  `json:"-" yaml:"-"` // для сортировки
+	Ref  *Ref `json:"-" yaml:"-"`
+	Spec *T   `json:"-" yaml:"-"`
 }
 
 // NewRefOrSpec creates an object of RefOrSpec type for either Ref or Spec
