@@ -1,5 +1,11 @@
 package spec
 
+import (
+	"bytes"
+	"encoding/json"
+	"sort"
+)
+
 // JsonSchemaTypeString
 //
 // https://json-schema.org/understanding-json-schema/reference/string.html#string
@@ -39,7 +45,7 @@ type JsonSchemaTypeObject struct {
 	// Any property that doesn't match any of the property names in the properties keyword is ignored by this keyword.
 	//
 	// https://json-schema.org/understanding-json-schema/reference/object.html#properties
-	Properties map[string]*RefOrSpec[Schema] `json:"properties,omitempty" yaml:"properties,omitempty"`
+	Properties SchemaProps `json:"properties,omitempty" yaml:"properties,omitempty"`
 	// Sometimes you want to say that, given a particular kind of property name, the value should match a particular schema.
 	// That’s where patternProperties comes in: it maps regular expressions to schemas.
 	// If a property name matches the given regular expression, the property value must validate against the corresponding schema.
@@ -83,6 +89,70 @@ type JsonSchemaTypeObject struct {
 	//
 	// https://json-schema.org/understanding-json-schema/reference/object.html#required-properties
 	Required []string `json:"required,omitempty" yaml:"required,omitempty"`
+}
+
+type SchemaProps map[string]*RefOrSpec[Schema]
+
+func (p SchemaProps) MarshalJSON() ([]byte, error) {
+	items := make(OrderSchemaItems, 0, len(p))
+
+	for name, schema := range p {
+		items = append(items, OrderSchemaItem{
+			Name:   name,
+			Schema: schema,
+		})
+	}
+
+	sort.Sort(items)
+
+	return json.Marshal(items)
+}
+
+// OrderSchemaItem holds a named schema (e.g. from a property of an object)
+type OrderSchemaItem struct {
+	Name   string
+	Schema *RefOrSpec[Schema]
+}
+
+// OrderSchemaItems is a sortable slice of named schemas.
+// The ordering is defined by the x-order schema extension.
+type OrderSchemaItems []OrderSchemaItem
+
+// MarshalJSON produces a json object with keys defined by the name schemas
+// of the OrderSchemaItems slice, keeping the original order of the slice.
+func (items OrderSchemaItems) MarshalJSON() ([]byte, error) {
+	buf := bytes.NewBuffer(nil)
+	buf.WriteString("{")
+	for i := range items {
+		if i > 0 {
+			buf.WriteString(",")
+		}
+		buf.WriteString("\"")
+		buf.WriteString(items[i].Name)
+		buf.WriteString("\":")
+		bs, err := json.Marshal(&items[i].Schema)
+		if err != nil {
+			return nil, err
+		}
+		buf.Write(bs)
+	}
+	buf.WriteString("}")
+	return buf.Bytes(), nil
+}
+
+func (items OrderSchemaItems) Len() int      { return len(items) }
+func (items OrderSchemaItems) Swap(i, j int) { items[i], items[j] = items[j], items[i] }
+func (items OrderSchemaItems) Less(i, j int) (ret bool) {
+	if items[i].Schema.Order > 0 {
+		if items[j].Schema.Order > 0 {
+			return items[i].Schema.Order < items[j].Schema.Order
+		}
+		return true
+	} else if items[j].Schema.Order > 0 {
+		return false
+	}
+
+	return items[i].Name < items[j].Name
 }
 
 // JsonSchemaTypeArray
